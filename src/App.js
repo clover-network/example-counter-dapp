@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Web3ReactProvider, useWeb3React, } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
-import { useEagerConnect, useInactiveListener } from './hooks'
+import { useEagerConnect, useInactiveListener, useContract, useContractCallData } from './hooks'
 import { Spinner } from './Spiner'
 import { injected } from './connectors'
+
+import CounterContract from './contract_build/Counter.json'
 
 import './App.css';
 
@@ -86,6 +88,24 @@ function ConnectChain(props) {
 
 function App() {
   const triedEager = useEagerConnect()
+  const counter = useContract(CounterContract)
+  const [loading, setLoading] = useState(false)
+  const currentValue = useContractCallData(counter, 'current_value', [])
+
+  const currentValueText = (currentValue === undefined || currentValue === null) ? 'N/A' : currentValue
+  const callMethod = async (name) => {
+    if (loading) {
+      return
+    }
+    setLoading(true)
+    try {
+      await counter[name]()
+    } catch(ex) {
+      console.error('transaction error: ', ex)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
       <div className="App">
@@ -94,10 +114,12 @@ function App() {
           <ConnectChain triedEager={triedEager} />
           <ChainId/>
           <p>
-            Current value: n/a
-        </p>
-          <button className="CounterButton">Inc Counter</button>
-          <button className="CounterButton">Dec Counter</button>
+            Current value: {currentValueText}
+          </p>
+
+          {loading && <Spinner color={'red'} style={{ height: '40px', marginLeft: '-1rem' }} />}
+          <button className="CounterButton" onClick={() => callMethod('inc')}>Inc Counter</button>
+          <button className="CounterButton" onClick={() => callMethod('dec')}>Dec Counter</button>
         </header>
       </div>
   );

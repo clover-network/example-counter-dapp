@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Contract } from '@ethersproject/contracts'
 import { useWeb3React } from '@web3-react/core'
 import { injected } from './connectors'
 
@@ -69,4 +70,58 @@ export function useInactiveListener(suppress = false) {
       }
     }
   }, [active, error, suppress, activate])
+}
+
+export function useBlockNumber() {
+  const { library }= useWeb3React()
+  const [blockNumber, setBlockNumber] = useState(-1)
+
+  useEffect(() =>  {
+    if (!library) {
+      return
+    }
+    const t = setInterval(async () => {
+      try {
+        setBlockNumber(await library.getBlockNumber())
+      } catch(ex) {
+        console.error('failed to get block number', ex)
+      }
+      return () => {
+        clearInterval(t)
+      }
+    }, 1000)
+
+  }, [library])
+  return blockNumber
+}
+
+export function useContract(contractJson) {
+  const { chainId, library, account}= useWeb3React()
+
+  if (!chainId || !contractJson.networks || !contractJson.networks[chainId]) {
+    return null
+  }
+
+  const signer = library.getSigner(account).connectUnchecked()
+  return new Contract(contractJson.networks[chainId].address, contractJson.abi, signer)
+}
+
+export function useContractCallData(contract, methodName, args) {
+  const blockNumber = useBlockNumber()
+  const [ result, setResult ] = useState(null)
+  useEffect(() => {
+    if (!contract || !methodName) {
+      return null
+    }
+    async function loadData() {
+      try {
+        const result = await contract[methodName](...args)
+        setResult(result)
+      } catch (ex) {
+        console.log(`failed call contract method ${methodName}: `, ex)
+      }
+    }
+    loadData()
+  }, [blockNumber])
+  return result
 }
