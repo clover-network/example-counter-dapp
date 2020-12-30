@@ -41,6 +41,15 @@
   width: 200px;
 }
 
+.ChainIdWrapper {
+  display: inline-block;
+}
+
+
+.ChainIdText {
+  color: blue;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
