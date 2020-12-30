@@ -5,18 +5,12 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        <h1>Counter Example</h1>
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+            Current value: n/a
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <button className="CounterButton">Inc Counter</button>
+        <button className="CounterButton">Dec Counter</button>
       </header>
     </div>
   );
