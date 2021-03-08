@@ -11,8 +11,8 @@ module.exports = {
   },
   networks: {
     development: {
-      provider: () => new pkProvider(privateKey, `http://127.0.0.1:9933`, 1337),
-      network_id: 1337,
+      provider: () => new pkProvider(privateKey, `http://192.168.9.20:9933`, 1023),
+      network_id: 1023,
       gas: 55000000,
       gasPrice: 10_000_000_000,
       confirmations: 2,

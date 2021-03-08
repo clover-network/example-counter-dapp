@@ -16,7 +16,8 @@ function getLibrary(provider) {
 }
 
 function ChainId() {
-  const { chainId, library } = useWeb3React()
+  const context = useWeb3React()
+  const { chainId, library } = context
 
   return (
     <div className="ChainIdWrapper">
